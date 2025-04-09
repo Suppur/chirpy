@@ -39,5 +39,5 @@ func (cfg *apiConfig) handlerCreateUser(w http.ResponseWriter, r *http.Request) 
 		Email:      user.Email,
 	}
 
-	respondWithJSON(w, http.StatusOK, usr)
+	respondWithJSON(w, http.StatusCreated, usr)
 }

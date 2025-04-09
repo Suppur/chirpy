@@ -1,6 +1,7 @@
 package main
 
 import (
+	"errors"
 	"fmt"
 	"net/http"
 )
@@ -23,6 +24,13 @@ func (cfg *apiConfig) handlerReqNumber(w http.ResponseWriter, r *http.Request) {
 }
 
 func (cfg *apiConfig) handlerReset(w http.ResponseWriter, r *http.Request) {
+	if cfg.platform != "dev" {
+		respondWithError(w, http.StatusForbidden, "endpoint not to be used in prod!", errors.New("forbidden"))
+	}
+	if err := cfg.db.DeleteUsers(r.Context()); err != nil {
+		respondWithError(w, http.StatusInternalServerError, "failed to delete users from db", err)
+	}
+
 	cfg.fileServerHits.Store(0)
 
 	w.Header().Set("Content-Type:", "text/plain; charset=utf-8")
