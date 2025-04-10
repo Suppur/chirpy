@@ -10,18 +10,18 @@ import (
 	"github.com/google/uuid"
 )
 
+type Chirp struct {
+	Id         uuid.UUID     `json:"id"`
+	Created_at time.Time     `json:"created_at"`
+	Updated_at time.Time     `json:"updated_at"`
+	Body       string        `json:"body"`
+	User_id    uuid.NullUUID `json:"user_id"`
+}
+
 func (cfg *apiConfig) handlerChirp(w http.ResponseWriter, r *http.Request) {
 	type parameters struct {
 		Body    string    `json:"body"`
 		User_id uuid.UUID `json:"user_id"`
-	}
-
-	type returnVals struct {
-		Id         uuid.UUID     `json:"id"`
-		Created_at time.Time     `json:"created_at"`
-		Updated_at time.Time     `json:"updated_at"`
-		Body       string        `json:"body"`
-		User_id    uuid.NullUUID `json:"user_id"`
 	}
 
 	decoder := json.NewDecoder(r.Body)
@@ -52,7 +52,7 @@ func (cfg *apiConfig) handlerChirp(w http.ResponseWriter, r *http.Request) {
 		respondWithError(w, http.StatusInternalServerError, "failed to create chirp", err)
 	}
 
-	respBody := returnVals{
+	respBody := Chirp{
 		Id:         chirp.ID,
 		Created_at: chirp.CreatedAt,
 		Updated_at: chirp.UpdatedAt,
