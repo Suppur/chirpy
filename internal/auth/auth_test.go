@@ -66,3 +66,7 @@ func TestTokenCreateAndValidate(t *testing.T) {
 		t.Fatalf("error, expired token was validated: %v", expiredId)
 	}
 }
+
+func TestGetBearerToken(t *testing.T) {
+
+}

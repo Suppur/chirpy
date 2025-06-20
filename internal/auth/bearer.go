@@ -1,7 +1,19 @@
 package auth
 
-import "net/http"
+import (
+	"errors"
+	"log"
+	"net/http"
+	"strings"
+)
 
-func GetBearerToken(headers http.Header) (string, error) {}
+func GetBearerToken(headers http.Header) (string, error) {
+	tokenString := headers.Get("Authorization")
+	if tokenString == "" {
+		log.Print("error: token string is empty")
+		return "", errors.New("token string cannot be empty")
+	}
+	tokenString = strings.TrimPrefix(tokenString, "Bearer ")
 
-// chromium --ozone-platform-hint=wayland
+	return tokenString, nil
+}
