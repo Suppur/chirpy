@@ -49,6 +49,7 @@ func main() {
 
 	mux.HandleFunc("POST /api/users", cfg.handlerCreateUser)
 	mux.HandleFunc("POST /api/login", cfg.handlerLogin)
+	mux.HandleFunc("POST /api/refresh", cfg.handlerRefreshToken)
 
 	mux.HandleFunc("GET /admin/metrics", cfg.handlerReqNumber)
 	mux.HandleFunc("POST /admin/reset", cfg.handlerReset)
