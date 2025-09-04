@@ -12,9 +12,8 @@ func (cfg *apiConfig) handlerRefreshToken(w http.ResponseWriter, r *http.Request
 	token, err := auth.GetBearerToken(r.Header)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "error retrieving bearer token", err)
-		return
 	}
-
+	fmt.Println(token)
 	validToken, err := cfg.db.GetToken(r.Context(), token)
 	fmt.Println("Expires at:", validToken.ExpiresAt)
 	fmt.Println("REvoked at:", validToken.RevokedAt)
