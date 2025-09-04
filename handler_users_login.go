@@ -62,7 +62,8 @@ func (cfg *apiConfig) handlerLogin(w http.ResponseWriter, r *http.Request) {
 			Valid: true,
 		},
 		ExpiresAt: sql.NullTime{
-			Time: time.Now().Add(time.Hour * 1440),
+			Time:  time.Now().Add(time.Hour * 1440),
+			Valid: true,
 		},
 	})
 	if err != nil {

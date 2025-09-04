@@ -2,21 +2,21 @@ package main
 
 import (
 	"database/sql"
-	"errors"
 	"net/http"
 	"time"
 
+	"github.com/Suppur/chirpy/internal/auth"
 	"github.com/Suppur/chirpy/internal/database"
 )
 
 func (cfg *apiConfig) handlerRevoke(w http.ResponseWriter, r *http.Request) {
-	token := r.Header.Get("Authorization")
-	if token == "" {
-		respondWithError(w, http.StatusUnauthorized, "invalid token", errors.New("token missing"))
+	token, err := auth.GetBearerToken(r.Header)
+	if err != nil {
+		respondWithError(w, http.StatusInternalServerError, "error retrieving bearer token", err)
 		return
 	}
 
-	err := cfg.db.RevokeToken(r.Context(), database.RevokeTokenParams{
+	err = cfg.db.RevokeToken(r.Context(), database.RevokeTokenParams{
 		Token: token,
 		RevokedAt: sql.NullTime{
 			Time:  time.Now(),
@@ -29,6 +29,7 @@ func (cfg *apiConfig) handlerRevoke(w http.ResponseWriter, r *http.Request) {
 	})
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "error, failed to revoke token", err)
+		return
 	}
 
 	respondWithJSON(w, http.StatusNoContent, err)

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"net/http"
 	"time"
 
@@ -9,15 +8,17 @@ import (
 )
 
 func (cfg *apiConfig) handlerRefreshToken(w http.ResponseWriter, r *http.Request) {
+	type response struct {
+		Token string `json:"token"`
+	}
+
 	token, err := auth.GetBearerToken(r.Header)
 	if err != nil {
-		respondWithError(w, http.StatusInternalServerError, "error retrieving bearer token", err)
+		respondWithError(w, http.StatusUnauthorized, "error retrieving bearer token", err)
+		return
 	}
-	fmt.Println(token)
 	validToken, err := cfg.db.GetToken(r.Context(), token)
-	fmt.Println("Expires at:", validToken.ExpiresAt)
-	fmt.Println("REvoked at:", validToken.RevokedAt)
-	if err != nil || token != validToken.Token || validToken.ExpiresAt.Time.Before(time.Now()) {
+	if err != nil || validToken.ExpiresAt.Time.Before(time.Now()) || validToken.RevokedAt.Valid {
 		respondWithError(w, http.StatusUnauthorized, "invalid token", err)
 		return
 	}
@@ -25,7 +26,10 @@ func (cfg *apiConfig) handlerRefreshToken(w http.ResponseWriter, r *http.Request
 	newToken, err := auth.MakeJWT(validToken.UserID.UUID, cfg.secret, time.Hour)
 	if err != nil {
 		respondWithError(w, http.StatusInternalServerError, "error creating new access token", err)
+		return
 	}
 
-	respondWithJSON(w, http.StatusOK, newToken)
+	respondWithJSON(w, http.StatusOK, response{
+		Token: newToken,
+	})
 }
